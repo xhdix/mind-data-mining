@@ -14,6 +14,24 @@ curl -v --trace-time -m 31 --connect-to ::www.notblocked.com: https://www.blocke
 ``` sh
 curl -v --resolve 'www.blocked.com:443:1.2.3.4' --connect-to ::www.blocked.com: https://www.notblocked.com/
 ```
+#### DNS over UDP -- system
+```sh
+dig blocked.com
+```
+
+#### DNS over TCP -- system
+```sh
+dig +tcp blocked.com
+```
+#### DNS over TCP -- specefic 
+```sh
+dig +tcp blocked.com @1.0.0.1
+```
+### DNS over HTTPS
+``` sh
+curl -s  "https://dns.google.com/resolve?name=www.blocked.com&type=ANY&random_padding=askdkadaas32somerandompaddingminusdomainname32dskdKFKs"
+```
+128 byte <= domain + padding
 
 #### check IP blocking
 ``` sh
