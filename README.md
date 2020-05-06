@@ -12,13 +12,16 @@ curl -v --trace-time -m 31 --connect-to ::www.notblocked.com: https://www.blocke
 ```
 #### check IP blocking 1
 ``` sh
-curl -v --resolve 'www.blocked.com:443:1.2.3.4' --connect-to ::www.blocked.com: https://www.notblocked.com/
+curl -v --trace-time -m 31 --resolve 'www.blocked.com:443:1.2.3.4' --connect-to ::www.blocked.com: https://www.notblocked.com/
 ```
 #### DNS over UDP -- system
 ```sh
 dig blocked.com
 ```
-
+#### DNS trace over UDP -- system
+```sh
+dig blocked.com +trace
+```
 #### DNS over TCP -- system
 ```sh
 dig +tcp blocked.com
