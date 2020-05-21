@@ -5,14 +5,8 @@
 #
 function usage_then_die() {
   echo ""
-  echo "usage: $0 <IP>" 1>&2
+  echo "usage: $0 <minioonipath> <IP>" 1>&2
   echo ""
-  echo "# Environment variables"
-  echo ""
-  echo "- MINIOONI_TEST_HELPER: optional domain for test helper"
-  echo ""
-  echo "- MINIOONI_EXTRA_OPTIONS: extra options for miniooni (e.g. -n to avoid"
-  echo "submitting measurements to the OONI collector)"
   echo ""
   exit 1
 }
@@ -20,6 +14,14 @@ function usage_then_die() {
 inputCount=$#
 
 [ $inputCount -ge 1 ] || usage_then_die
+
+if [ ! -f $1 ]; then
+   log "miniooni not found in $1"
+   usage_then_die
+else
+  path=$1
+  shift
+fi
 
 function log() {
   echo "$@" 1>&2
@@ -58,18 +60,18 @@ function must() {
 }
 
 function urlgetterip() {
-  run ../src/probe-engine/miniooni -v -OResolverURL=udp://"$1":53 -i dnslookup://example.com urlgetter &
+  run $path -v -OResolverURL=udp://"$1":53 -i dnslookup://example.com urlgetter &
   wait
-  run ../src/probe-engine/miniooni -v -OResolverURL=tcp://"$1":53 -i dnslookup://example.com urlgetter &
+  run $path -v -OResolverURL=tcp://"$1":53 -i dnslookup://example.com urlgetter &
   wait
-  run ../src/probe-engine/miniooni -v -OResolverURL=dot://"$1":853 -i dnslookup://example.com urlgetter &
+  run $path -v -OResolverURL=dot://"$1":853 -i dnslookup://example.com urlgetter &
   wait
-  run ../src/probe-engine/miniooni -v -OResolverURL=doh://https://$(resolveip -s $1)/dns-query -i dnslookup://example.com urlgetter &
+  run $path -v -OResolverURL=doh://https://$(resolveip -s $1)/dns-query -i dnslookup://example.com urlgetter &
   wait
 }
 
 function urlgetterdomain() {
-  run ../src/probe-engine/miniooni -v -OResolverURL=doh://https://$(resolveip -s $1)/dns-query -i dnslookup://example.com urlgetter &
+  run $path -v -OResolverURL=doh://https://$(resolveip -s $1)/dns-query -i dnslookup://example.com urlgetter &
   wait
 }
 
