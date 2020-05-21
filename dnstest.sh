@@ -66,12 +66,12 @@ function urlgetterip() {
   wait
   run $path -v -OResolverURL=dot://"$1":853 -i dnslookup://example.com urlgetter &
   wait
-  run $path -v -OResolverURL=doh://https://$(resolveip -s $1)/dns-query -i dnslookup://example.com urlgetter &
+  run $path -v -OResolverURL=doh://https://$(dig +short -x $1)/dns-query -i dnslookup://example.com urlgetter &
   wait
 }
 
 function urlgetterdomain() {
-  run $path -v -OResolverURL=doh://https://$(resolveip -s $1)/dns-query -i dnslookup://example.com urlgetter &
+  run $path -v -OResolverURL=doh://https://$1/dns-query -i dnslookup://example.com urlgetter &
   wait
 }
 
