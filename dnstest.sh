@@ -1,11 +1,11 @@
 #!/bin/bash
 #
 #https://github.com/ooni/probe-engine/pull/616
-#
+#https://github.com/bassosimone/aladdin/blob/master/domain-check.bash
 #
 function usage_then_die() {
   echo ""
-  echo "usage: $0 <minioonipath> <IP>" 1>&2
+  echo "usage: $0 <minioonipath> <IP> <IP> <domain> <domain> <domain>" 1>&2
   echo ""
   echo ""
   exit 1
@@ -15,7 +15,7 @@ inputCount=$#
 
 [ $inputCount -ge 1 ] || usage_then_die
 
-if [ ! -f $1 ]; then
+if [ ! -x $1 ]; then
    log "miniooni not found in $1"
    usage_then_die
 else
@@ -33,7 +33,7 @@ function fatal() {
 }
 
 log_file=dnstest.log
-log -n "removing stale $log_file and temp files from previous runs if needed... "
+log -n "removing stale $log_file from previous runs if needed... "
 rm -f $log_file
 log "done"
 
@@ -53,18 +53,19 @@ function urlgetterip() {
   run $path -v -OResolverURL=dot://"$1":853 -i dnslookup://example.com urlgetter &
   wait
   log "DNS over TLS is done."
-  run $path -v -OResolverURL=doh://https://$(dig +short -x $1)/dns-query -i dnslookup://example.com urlgetter &
+  run $path -v -OResolverURL=https://$(dig +short -x $1)/dns-query -i dnslookup://example.com urlgetter &
   wait
   log "DNS over HTTPS is done."
 }
 
 function urlgetterdomain() {
-  run $path -v -OResolverURL=doh://https://$1/dns-query -i dnslookup://example.com urlgetter &
+  run $path -v -OResolverURL=https://$1/dns-query -i dnslookup://example.com urlgetter &
   wait
   log "DNS over HTTPS is done."
 }
 
 inputCounter=0
+((inputCount--))
 while [[ $1 != "" ]]; do
   ((inputCounter++))
   log "[$inputCounter/$inputCount] running with input: $1"
