@@ -27,10 +27,6 @@ function log() {
   echo "$@" 1>&2
 }
 
-function checking() {
-  log -n "checking $@... "
-}
-
 function fatal() {
   log "$@"
   exit 1
@@ -47,32 +43,25 @@ function run() {
   "$@"        2>> $log_file
 }
 
-report_file=report.jsonl
-
-function fatal_with_logs() {
-  log "$@"
-  log "please, check $log_file and $report_file for more insights"
-  exit 1
-}
-
-function must() {
-  "$@" || fatal_with_logs "failure"
-}
-
 function urlgetterip() {
   run $path -v -OResolverURL=udp://"$1":53 -i dnslookup://example.com urlgetter &
   wait
+  log "DNS over UDP is done."
   run $path -v -OResolverURL=tcp://"$1":53 -i dnslookup://example.com urlgetter &
   wait
+  log "DNS over TCP is done."
   run $path -v -OResolverURL=dot://"$1":853 -i dnslookup://example.com urlgetter &
   wait
+  log "DNS over TLS is done."
   run $path -v -OResolverURL=doh://https://$(dig +short -x $1)/dns-query -i dnslookup://example.com urlgetter &
   wait
+  log "DNS over HTTPS is done."
 }
 
 function urlgetterdomain() {
   run $path -v -OResolverURL=doh://https://$1/dns-query -i dnslookup://example.com urlgetter &
   wait
+  log "DNS over HTTPS is done."
 }
 
 inputCounter=0
