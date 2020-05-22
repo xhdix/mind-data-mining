@@ -3,9 +3,12 @@
 #https://github.com/ooni/probe-engine/pull/616
 #https://github.com/bassosimone/aladdin/blob/master/domain-check.bash
 #
+#
+#
+
 function usage_then_die() {
   echo ""
-  echo "usage: $0 <minioonipath> <IP> <IP> <domain> <domain> <domain>" 1>&2
+  echo "usage: $0 <minioonipath> <IP> <IP> <domain> <URI> <domain>" 1>&2
   echo ""
   echo ""
   exit 1
@@ -43,24 +46,23 @@ function run() {
   "$@"        2>> $log_file
 }
 
-function urlgetterip() {
+function urlgetterdo53() {
   run $path -v -OResolverURL=udp://"$1":53 -i dnslookup://example.com urlgetter &
   wait
   log "DNS over UDP is done."
   run $path -v -OResolverURL=tcp://"$1":53 -i dnslookup://example.com urlgetter &
   wait
   log "DNS over TCP is done."
-  run $path -v -OResolverURL=dot://"$1":853 -i dnslookup://example.com urlgetter &
-  wait
-  log "DNS over TLS is done."
-  PTR=$(dig +short -x $1)
-  run $path -v -OResolverURL=https://${PTR%?}/dns-query -i dnslookup://example.com urlgetter &
-  wait
-  log "DNS over HTTPS is done."
 }
 
-function urlgetterdomain() {
-  run $path -v -OResolverURL=https://$1/dns-query -i dnslookup://example.com urlgetter &
+function urlgetterdot() {
+  run $path -v -OResolverURL=dot://$1 -i dnslookup://example.com urlgetter &
+  wait
+  log "DNS over TLS is done."
+}
+
+function urlgetterdoh() {
+  run $path -v -OResolverURL=$1 -i dnslookup://example.com urlgetter &
   wait
   log "DNS over HTTPS is done."
 }
@@ -69,11 +71,16 @@ inputCounter=0
 ((inputCount--))
 while [[ $1 != "" ]]; do
   ((inputCounter++))
-  log "[$inputCounter/$inputCount] running with input: $1"
-  if [[ $1 =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-    urlgetterip $1 &
+  input=$1
+  log "[$inputCounter/$inputCount] running with input: $input"
+  if [[ $input =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    urlgetterdo53 $input &
+  else if [[ $input == "https://"* ]]; then
+    urlgetterdoh $input &
+  else if [[ $input == "dot://"* ]]; then
+    urlgetterdot ${input#"dot://"} &
   else
-    urlgetterdomain $1 &
+    urlgetterdot $input &
   fi
   wait
   sleep 1
