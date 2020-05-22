@@ -69,16 +69,17 @@ function urlgetterdoh() {
 
 inputCounter=0
 ((inputCount--))
+
 while [[ $1 != "" ]]; do
   ((inputCounter++))
   input=$1
   log "[$inputCounter/$inputCount] running with input: $input"
-  if [[ $input =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  if [[ $input =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] ; then
     urlgetterdo53 $input &
-  else if [[ $input == "https://"* ]]; then
+  elif [[ ${input:0:8} == "https://" ]] ; then
     urlgetterdoh $input &
-  else if [[ $input == "dot://"* ]]; then
-    urlgetterdot ${input#"dot://"} &
+  elif [[ ${input:0:6} == "dot://" ]] ; then
+    urlgetterdot ${input:0:6} &
   else
     urlgetterdot $input &
   fi
