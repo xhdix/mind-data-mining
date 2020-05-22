@@ -53,7 +53,8 @@ function urlgetterip() {
   run $path -v -OResolverURL=dot://"$1":853 -i dnslookup://example.com urlgetter &
   wait
   log "DNS over TLS is done."
-  run $path -v -OResolverURL=https://$(dig +short -x $1)/dns-query -i dnslookup://example.com urlgetter &
+  PTR=$(dig +short -x $1)
+  run $path -v -OResolverURL=https://${PTR%?}/dns-query -i dnslookup://example.com urlgetter &
   wait
   log "DNS over HTTPS is done."
 }
