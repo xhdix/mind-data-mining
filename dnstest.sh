@@ -10,6 +10,7 @@ function usage_then_die() {
   echo ""
   echo "usage: $0 <test-name> <miniooni-path> <IP> <domain> <URI>" 1>&2
   echo ""
+  echo "e.g.: ./$0 vodafone-dot dot://1.1.1.1 dns.google.com dot://9.9.9.9"  1>&2
   echo ""
   exit 1
 }
@@ -34,11 +35,6 @@ else
   path=$1
   shift
 fi
-
-function fatal() {
-  log "$@"
-  exit 1
-}
 
 function run() {
   echo ""      >> $log_file
