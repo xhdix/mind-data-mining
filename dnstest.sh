@@ -8,7 +8,7 @@
 
 function usage_then_die() {
   echo ""
-  echo "usage: $0 <minioonipath> <IP> <IP> <domain> <URI> <domain>" 1>&2
+  echo "usage: $0 <test-name> <miniooni-path> <IP> <domain> <URI>" 1>&2
   echo ""
   echo ""
   exit 1
@@ -18,6 +18,15 @@ inputCount=$#
 
 [ $inputCount -ge 1 ] || usage_then_die
 
+mkdir -p ./tmp
+log_file=./tmp/`date +%Y%m%d`-$1.log
+report_file=./tmp/`date +%Y%m%d`-$1.jsonl
+shift
+
+function log() {
+  echo "$@" 1>&2
+}
+
 if [ ! -x $1 ]; then
    log "miniooni not found in $1"
    usage_then_die
@@ -26,19 +35,10 @@ else
   shift
 fi
 
-function log() {
-  echo "$@" 1>&2
-}
-
 function fatal() {
   log "$@"
   exit 1
 }
-
-log_file=dnstest.log
-#log -n "removing stale $log_file from previous runs if needed... "
-#rm -f $log_file
-#log "done"
 
 function run() {
   echo ""      >> $log_file
@@ -47,22 +47,22 @@ function run() {
 }
 
 function urlgetterdo53() {
-  run $path -v -OResolverURL=udp://"$1":53 -i dnslookup://example.com urlgetter &
+  run $path -v -o $report_file -OResolverURL=udp://"$1":53 -i dnslookup://example.com urlgetter &
   wait
   log "DNS over UDP is done."
-  run $path -v -OResolverURL=tcp://"$1":53 -i dnslookup://example.com urlgetter &
+  run $path -v -o $report_file -OResolverURL=tcp://"$1":53 -i dnslookup://example.com urlgetter &
   wait
   log "DNS over TCP is done."
 }
 
 function urlgetterdot() {
-  run $path -v -OResolverURL=dot://$1 -i dnslookup://example.com urlgetter &
+  run $path -v -o $report_file -OResolverURL=dot://$1:853 -i dnslookup://example.com urlgetter &
   wait
   log "DNS over TLS is done."
 }
 
 function urlgetterdoh() {
-  run $path -v -OResolverURL=$1 -i dnslookup://example.com urlgetter &
+  run $path -v -o $report_file -OResolverURL=$1 -i dnslookup://example.com urlgetter &
   wait
   log "DNS over HTTPS is done."
 }
