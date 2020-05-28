@@ -64,7 +64,7 @@ function urlgetterdoh() {
 }
 
 inputCounter=0
-((inputCount--))
+inputCount=$#
 
 while [[ $1 != "" ]]; do
   ((inputCounter++))
