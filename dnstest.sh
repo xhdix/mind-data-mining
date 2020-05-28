@@ -75,7 +75,7 @@ while [[ $1 != "" ]]; do
   elif [[ ${input:0:8} == "https://" ]] ; then
     urlgetterdoh $input &
   elif [[ ${input:0:6} == "dot://" ]] ; then
-    urlgetterdot ${input:0:6} &
+    urlgetterdot ${input:6} &
   else
     urlgetterdot $input &
   fi
