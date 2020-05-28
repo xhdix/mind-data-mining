@@ -55,12 +55,18 @@ function urlgetterdot() {
   run $path -v -o $report_file -OResolverURL=dot://$1:853 -i dnslookup://example.com urlgetter &
   wait
   log "DNS over TLS is done."
+  run $path -v -o $report_file -OTLSVersion=TLSv1.3 -OResolverURL=dot://$1:853 -i dnslookup://example.com urlgetter &
+  wait
+  log "DNS over TLS v1.3 is done."
 }
 
 function urlgetterdoh() {
   run $path -v -o $report_file -OResolverURL=$1 -i dnslookup://example.com urlgetter &
   wait
   log "DNS over HTTPS is done."
+  run $path -v -o $report_file -OTLSVersion=TLSv1.3 -OResolverURL=$1 -i dnslookup://example.com urlgetter &
+  wait
+  log "DNS over HTTPS (TLSv1.3) is done."
 }
 
 inputCounter=0
