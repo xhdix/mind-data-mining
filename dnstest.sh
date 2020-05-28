@@ -36,9 +36,9 @@ function fatal() {
 }
 
 log_file=dnstest.log
-log -n "removing stale $log_file from previous runs if needed... "
-rm -f $log_file
-log "done"
+#log -n "removing stale $log_file from previous runs if needed... "
+#rm -f $log_file
+#log "done"
 
 function run() {
   echo ""      >> $log_file
