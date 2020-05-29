@@ -36,8 +36,8 @@ else
   shift
 fi
 
-function getipv4list() {
-  echo $(tail -n1 $report_file|jq -r ".test_keys.queries|.[]|select(.hostname==\"$1\")|select(.query_type==\"A\")|.answers|.[].ipv4")
+function getipv4second() {
+  echo $(tail -n1 $report_file|jq -r ".test_keys.queries|.[0]|select(.hostname==\"$1\")|select(.query_type==\"A\")|.answers|.[1].ipv4")
 }
 
 function run() {
@@ -59,42 +59,32 @@ function urlgetterdot() {
   run $path -v -o $report_file -OResolverURL=dot://$1:853 -i dnslookup://example.com urlgetter &
   wait
   log "DNS over TLS is done."
-  ipv4_list=`getipv4list $domain`
-  for nextip in ${ipv4_list[@]:1}; do
-    run $path -v -o $report_file -ODNSCache="$1 $nextip" -OResolverURL=dot://$1:853 -i dnslookup://example.com urlgetter &
-    wait
-    log "DNS over TLS is done with the next IP."
-  done
+  ipv4_second=`getipv4second $domain`
+  run $path -v -o $report_file -ODNSCache="$1 $ipv4_second" -OResolverURL=dot://$1:853 -i dnslookup://example.com urlgetter &
+  wait
+  log "DNS over TLS is done with the second IP."
   run $path -v -o $report_file -OTLSVersion=TLSv1.3 -OResolverURL=dot://$1:853 -i dnslookup://example.com urlgetter &
   wait
   log "DNS over TLS v1.3 is done."
-  ipv4_list=`getipv4list $domain`
-  for nextip in ${ipv4_list[@]:1}; do
-    run $path -v -o $report_file  -OTLSVersion=TLSv1.3 -ODNSCache="$1 $nextip" -OResolverURL=dot://$1:853 -i dnslookup://example.com urlgetter &
-    wait
-    log "DNS over TLS v1.3 is done with the next IP."
-  done
+  run $path -v -o $report_file  -OTLSVersion=TLSv1.3 -ODNSCache="$1 $ipv4_second" -OResolverURL=dot://$1:853 -i dnslookup://example.com urlgetter &
+  wait
+  log "DNS over TLS v1.3 is done with the second IP."
 }
 
 function urlgetterdoh() {
   run $path -v -o $report_file -OResolverURL=$1 -i dnslookup://example.com urlgetter &
   wait
   log "DNS over HTTPS is done."
-  ipv4_list=`getipv4list $domain`
-  for nextip in ${ipv4_list[@]:1}; do
-    run $path -v -o $report_file -ODNSCache="$1 $nextip" -OResolverURL=$1 -i dnslookup://example.com urlgetter &
-    wait
-    log "DNS over HTTPS is done with the next IP."
-  done
+  ipv4_second=`getipv4second $domain`
+  run $path -v -o $report_file -ODNSCache="$1 $ipv4_second" -OResolverURL=$1 -i dnslookup://example.com urlgetter &
+  wait
+  log "DNS over HTTPS is done with the second IP."
   run $path -v -o $report_file -OTLSVersion=TLSv1.3 -OResolverURL=$1 -i dnslookup://example.com urlgetter &
   wait
   log "DNS over HTTPS (TLSv1.3) is done."
-  ipv4_list=`getipv4list $domain`
-  for nextip in ${ipv4_list[@]:1}; do
-    run $path -v -o $report_file -OTLSVersion=TLSv1.3 -ODNSCache="$1 $nextip" -OResolverURL=$1 -i dnslookup://example.com urlgetter &
-    wait
-    log "DNS over HTTPS (TLSv1.3) is done with the next IP."
-  done
+  run $path -v -o $report_file -OTLSVersion=TLSv1.3 -ODNSCache="$1 $ipv4_second" -OResolverURL=$1 -i dnslookup://example.com urlgetter &
+  wait
+  log "DNS over HTTPS (TLSv1.3) is done with the second IP."
 }
 
 inputCounter=0
