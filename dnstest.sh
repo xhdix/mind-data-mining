@@ -68,6 +68,7 @@ function urlgetterdot() {
   run $path -v -o $report_file -OTLSVersion=TLSv1.3 -OResolverURL=dot://$1:853 -i dnslookup://example.com urlgetter &
   wait
   log "DNS over TLS v1.3 is done."
+  ipv4_second=$(getipv4second $1)
   if [ ! -z "$ipv4_second" ]; then
     run $path -v -o $report_file  -OTLSVersion=TLSv1.3 -ODNSCache="$1 $ipv4_second" -OResolverURL=dot://$1:853 -i dnslookup://example.com urlgetter &
     wait
@@ -88,6 +89,7 @@ function urlgetterdoh() {
   run $path -v -o $report_file -OTLSVersion=TLSv1.3 -OResolverURL=$1 -i dnslookup://example.com urlgetter &
   wait
   log "DNS over HTTPS (TLSv1.3) is done."
+  ipv4_second=$(getipv4second $1)
   if [ ! -z "$ipv4_second" ]; then
     run $path -v -o $report_file -OTLSVersion=TLSv1.3 -ODNSCache="$1 $ipv4_second" -OResolverURL=$1 -i dnslookup://example.com urlgetter &
     wait
