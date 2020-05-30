@@ -36,6 +36,25 @@ else
   shift
 fi
 
+function checking() {
+  log -n "checking $@... "
+}
+
+function fatal() {
+  log "$@"
+  exit 1
+}
+
+function require() {
+  checking "for $1"
+  if ! [ -x "$(command -v $1)" ]; then
+    fatal "not found; please run: $2"
+  fi
+  log "ok"
+}
+
+require jq "sudo apt install jq (or sudo apk add jq)"
+
 function getipv4second() {
   echo $(tail -n1 $report_file|jq -r ".test_keys.queries|.[0]|select(.hostname==\"$1\")|select(.query_type==\"A\")|.answers|.[1].ipv4")
 }
