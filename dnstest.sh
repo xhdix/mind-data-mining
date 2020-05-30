@@ -83,7 +83,7 @@ function urlgetterdoh() {
   domain=$(echo $1 | sed -e "s/[^/]*\/\/\([^@]*@\)\?\([^:/]*\).*/\2/")
   ipv4_second=$(getipv4second $domain)
   if [[ $ipv4_second =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-    run $path -v -o $report_file -ODNSCache="$1 $ipv4_second" -OResolverURL=$1 -i dnslookup://example.com urlgetter &
+    run $path -v -o $report_file -ODNSCache="$domain $ipv4_second" -OResolverURL=$1 -i dnslookup://example.com urlgetter &
     wait
     log "DNS over HTTPS is done with the second IP."
   fi
@@ -93,7 +93,7 @@ function urlgetterdoh() {
   domain=$(echo $1 | sed -e "s/[^/]*\/\/\([^@]*@\)\?\([^:/]*\).*/\2/")
   ipv4_second=$(getipv4second $domain)
   if [[ $ipv4_second =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-    run $path -v -o $report_file -OTLSVersion=TLSv1.3 -ODNSCache="$1 $ipv4_second" -OResolverURL=$1 -i dnslookup://example.com urlgetter &
+    run $path -v -o $report_file -OTLSVersion=TLSv1.3 -ODNSCache="$domain $ipv4_second" -OResolverURL=$1 -i dnslookup://example.com urlgetter &
     wait
     log "DNS over HTTPS (TLSv1.3) is done with the second IP."
   fi
