@@ -46,8 +46,8 @@ mtr -n -T 1.2.3.4 -P 443 --report
 mtr -n -T 1.2.3.4 -P 80 --report
 mtr -n -T 1.2.3.4 -P 1234 --report
 mtr -n 1.2.3.4 --report
-mtr -n -U 1.2.3.4 -P 53 --report
-mtr -n -U 1.2.3.4 -P 22 --report
+mtr -n -u 1.2.3.4 -P 53 --report
+mtr -n -u 1.2.3.4 -P 22 --report
 ```
 
 #### some other test
