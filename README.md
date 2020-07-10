@@ -32,10 +32,17 @@ dig +tcp blocked.com @1.0.0.1
 ```
 ### DNS over HTTPS
 ``` sh
-curl -s  "https://dns.google.com/resolve?name=www.blocked.com&type=ANY&random_padding=askdkadaas32somerandompaddingminusdomainname32dskdKFKs"
+curl -s  "https://dns.google.com/resolve?name=www.blocked.com&type=ANY&random_padding=cvbnmertyuiaskdkadaas128somerandompaddingminusdomainname128dskvbnmghjkluiobmghjkbnmghjkvbnmcvbnghjklsdfxcvqwertghjydKFs"
 ```
 128 byte <= domain + padding
 
+``` sh
+curl -H 'accept: application/dns-json' 'https://cloudflare-dns.com/dns-query?name=www.blocked.com&type=A'"
+```
+Connect with proxy:
+``` sh
+curl -x socks5://127.0.0.1:9050 -H 'accept: application/dns-json' 'https://cloudflare-dns.com/dns-query?name=www.blocked.com&type=A'"
+```
 #### check IP blocking
 ``` sh
 sudo traceroute --tcp --queries=1 -O info --port=443 1.2.3.4
