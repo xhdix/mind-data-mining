@@ -12,6 +12,8 @@ function usage_then_die() {
   echo ""
   echo "e.g.: ./$0 vodafone-dot ../src/probe-engine/miniooni 8.8.8.8 dot://1.1.1.1 dns.google.com dot://9.9.9.9 https://cloudflare-dns.com/dns-query"  1>&2
   echo ""
+  echo "e.g.: ./$0 vodafone-full-test ../src/probe-engine/miniooni \$(cat ./dnslist)"  1>&2
+  echo ""
   exit 1
 }
 
@@ -20,8 +22,8 @@ inputCount=$#
 [ $inputCount -ge 1 ] || usage_then_die
 
 mkdir -p ./tmp
-log_file=./tmp/`date +%Y%m%d`-$1.log
-report_file=./tmp/`date +%Y%m%d`-$1.jsonl
+log_file=./tmp/`date +%Y%m%dT%H%M%SZ`-$1.log
+report_file=./tmp/`date +%Y%m%dT%H%M%SZ`-$1.jsonl
 shift
 
 function log() {
@@ -69,29 +71,83 @@ function urlgetterdo53() {
   run $path -v -o $report_file -OResolverURL=udp://"$1":53 -i dnslookup://example.com urlgetter &
   wait
   log "DNS over UDP is done."
+  run $path -v -o $report_file -OResolverURL=udp://"$1":53 -i dnslookup://twitter.com urlgetter &
+  wait
+  log "DNS over UDP is done. (Twitter)"
+  run $path -v -o $report_file -OResolverURL=udp://"$1":53 -i dnslookup://pornhub.com urlgetter &
+  wait
+  log "DNS over UDP is done. (Pornhub)"
+  run $path -v -o $report_file -OResolverURL=udp://"$1":53 -i dnslookup://www.who.int urlgetter &
+  wait
+  log "DNS over UDP is done. (www.who.int)"
   run $path -v -o $report_file -OResolverURL=tcp://"$1":53 -i dnslookup://example.com urlgetter &
   wait
   log "DNS over TCP is done."
+  run $path -v -o $report_file -OResolverURL=tcp://"$1":53 -i dnslookup://twitter.com urlgetter &
+  wait
+  log "DNS over TCP is done. (Twitter)"
+  run $path -v -o $report_file -OResolverURL=tcp://"$1":53 -i dnslookup://pornhub.com urlgetter &
+  wait
+  log "DNS over TCP is done.(Pornhub)"
+  run $path -v -o $report_file -OResolverURL=tcp://"$1":53 -i dnslookup://www.who.int urlgetter &
+  wait
+  log "DNS over TCP is done.(www.who.int)"
 }
 
 function urlgetterdot() {
   run $path -v -o $report_file -OResolverURL=dot://$1:853 -i dnslookup://example.com urlgetter &
   wait
   log "DNS over TLS is done."
+  run $path -v -o $report_file -OResolverURL=dot://$1:853 -i dnslookup://twitter.com urlgetter &
+  wait
+  log "DNS over TLS is done. (Twitter)"
+  run $path -v -o $report_file -OResolverURL=dot://$1:853 -i dnslookup://pornhub.com urlgetter &
+  wait
+  log "DNS over TLS is done. (Pornhub)"
+  run $path -v -o $report_file -OResolverURL=dot://$1:853 -i dnslookup://www.who.int urlgetter &
+  wait
+  log "DNS over TLS is done. (www.who.int)"
   ipv4_second=$(getipv4second $1)
   if [[ $ipv4_second =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     run $path -v -o $report_file -ODNSCache="$1 $ipv4_second" -OResolverURL=dot://$1:853 -i dnslookup://example.com urlgetter &
     wait
     log "DNS over TLS is done with the second IP."
+    run $path -v -o $report_file -ODNSCache="$1 $ipv4_second" -OResolverURL=dot://$1:853 -i dnslookup://twitter.com urlgetter &
+    wait
+    log "DNS over TLS is done with the second IP. (Twitter)"
+    run $path -v -o $report_file -ODNSCache="$1 $ipv4_second" -OResolverURL=dot://$1:853 -i dnslookup://pornhub.com urlgetter &
+    wait
+    log "DNS over TLS is done with the second IP. (Pornhub)"
+    run $path -v -o $report_file -ODNSCache="$1 $ipv4_second" -OResolverURL=dot://$1:853 -i dnslookup://www.who.int urlgetter &
+    wait
+    log "DNS over TLS is done with the second IP. (www.who.int)"
   fi
   run $path -v -o $report_file -OTLSVersion=TLSv1.3 -OResolverURL=dot://$1:853 -i dnslookup://example.com urlgetter &
   wait
   log "DNS over TLS v1.3 is done."
+  run $path -v -o $report_file -OTLSVersion=TLSv1.3 -OResolverURL=dot://$1:853 -i dnslookup://twitter.com urlgetter &
+  wait
+  log "DNS over TLS v1.3 is done. (Twitter)"
+  run $path -v -o $report_file -OTLSVersion=TLSv1.3 -OResolverURL=dot://$1:853 -i dnslookup://pornhub.com urlgetter &
+  wait
+  log "DNS over TLS v1.3 is done. (Pornhub)"
+  run $path -v -o $report_file -OTLSVersion=TLSv1.3 -OResolverURL=dot://$1:853 -i dnslookup://www.who.int urlgetter &
+  wait
+  log "DNS over TLS v1.3 is done. (www.who.int)"
   ipv4_second=$(getipv4second $1)
   if [[ $ipv4_second =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     run $path -v -o $report_file  -OTLSVersion=TLSv1.3 -ODNSCache="$1 $ipv4_second" -OResolverURL=dot://$1:853 -i dnslookup://example.com urlgetter &
     wait
     log "DNS over TLS v1.3 is done with the second IP."
+    run $path -v -o $report_file  -OTLSVersion=TLSv1.3 -ODNSCache="$1 $ipv4_second" -OResolverURL=dot://$1:853 -i dnslookup://twitter.com urlgetter &
+    wait
+    log "DNS over TLS v1.3 is done with the second IP. (Twitter)"
+    run $path -v -o $report_file  -OTLSVersion=TLSv1.3 -ODNSCache="$1 $ipv4_second" -OResolverURL=dot://$1:853 -i dnslookup://pornhub.com urlgetter &
+    wait
+    log "DNS over TLS v1.3 is done with the second IP. (Pornhub)"
+    run $path -v -o $report_file  -OTLSVersion=TLSv1.3 -ODNSCache="$1 $ipv4_second" -OResolverURL=dot://$1:853 -i dnslookup://www.who.int urlgetter &
+    wait
+    log "DNS over TLS v1.3 is done with the second IP. (www.who.int)"
   fi
 }
 
@@ -99,22 +155,59 @@ function urlgetterdoh() {
   run $path -v -o $report_file -OResolverURL=$1 -i dnslookup://example.com urlgetter &
   wait
   log "DNS over HTTPS is done."
+  run $path -v -o $report_file -OResolverURL=$1 -i dnslookup://twitter.com urlgetter &
+  wait
+  log "DNS over HTTPS is done. (Twitter)"
+  run $path -v -o $report_file -OResolverURL=$1 -i dnslookup://pornhub.com urlgetter &
+  wait
+  log "DNS over HTTPS is done. (Pornhub)"
+  run $path -v -o $report_file -OResolverURL=$1 -i dnslookup://www.who.int urlgetter &
+  wait
+  log "DNS over HTTPS is done. (www.who.int)"
   domain=$(echo $1 | sed -e "s/[^/]*\/\/\([^@]*@\)\?\([^:/]*\).*/\2/")
   ipv4_second=$(getipv4second $domain)
   if [[ $ipv4_second =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     run $path -v -o $report_file -ODNSCache="$domain $ipv4_second" -OResolverURL=$1 -i dnslookup://example.com urlgetter &
     wait
     log "DNS over HTTPS is done with the second IP."
+    run $path -v -o $report_file -ODNSCache="$domain $ipv4_second" -OResolverURL=$1 -i dnslookup://twitter.com urlgetter &
+    wait
+    log "DNS over HTTPS is done with the second IP. (Twitter)"
+    run $path -v -o $report_file -ODNSCache="$domain $ipv4_second" -OResolverURL=$1 -i dnslookup://pornhub.com urlgetter &
+    wait
+    log "DNS over HTTPS is done with the second IP. (Pornhub)"
+    run $path -v -o $report_file -ODNSCache="$domain $ipv4_second" -OResolverURL=$1 -i dnslookup://www.who.int urlgetter &
+    wait
+    log "DNS over HTTPS is done with the second IP. (www.who.int)"
   fi
   run $path -v -o $report_file -OTLSVersion=TLSv1.3 -OResolverURL=$1 -i dnslookup://example.com urlgetter &
   wait
   log "DNS over HTTPS (TLSv1.3) is done."
+  run $path -v -o $report_file -OTLSVersion=TLSv1.3 -OResolverURL=$1 -i dnslookup://twitter.com urlgetter &
+  wait
+  log "DNS over HTTPS (TLSv1.3) is done. (Twitter)"
+  run $path -v -o $report_file -OTLSVersion=TLSv1.3 -OResolverURL=$1 -i dnslookup://pornhub.com urlgetter &
+  wait
+  log "DNS over HTTPS (TLSv1.3) is done. (Pornhub)"
+  run $path -v -o $report_file -OTLSVersion=TLSv1.3 -OResolverURL=$1 -i dnslookup://www.who.int urlgetter &
+  wait
+  log "DNS over HTTPS (TLSv1.3) is done. (www.who.int)"
   domain=$(echo $1 | sed -e "s/[^/]*\/\/\([^@]*@\)\?\([^:/]*\).*/\2/")
   ipv4_second=$(getipv4second $domain)
   if [[ $ipv4_second =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     run $path -v -o $report_file -OTLSVersion=TLSv1.3 -ODNSCache="$domain $ipv4_second" -OResolverURL=$1 -i dnslookup://example.com urlgetter &
     wait
     log "DNS over HTTPS (TLSv1.3) is done with the second IP."
+    run $path -v -o $report_file -OTLSVersion=TLSv1.3 -ODNSCache="$domain $ipv4_second" -OResolverURL=$1 -i dnslookup://twitter.com urlgetter &
+    wait
+    log "DNS over HTTPS (TLSv1.3) is done with the second IP. (Twitter)"
+    run $path -v -o $report_file -OTLSVersion=TLSv1.3 -ODNSCache="$domain $ipv4_second" -OResolverURL=$1 -i dnslookup://pornhub.com urlgetter &
+    wait
+    log "DNS over HTTPS (TLSv1.3) is done with the second IP. (Pornhub)"
+    run $path -v -o $report_file -OTLSVersion=TLSv1.3 -ODNSCache="$domain $ipv4_second" -OResolverURL=$1 -i dnslookup://www.who.int urlgetter &
+    wait
+    log "DNS over HTTPS (TLSv1.3) is done with the second IP. (www.who.int)"
+    
   fi
 }
 
