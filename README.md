@@ -79,6 +79,9 @@ sudo tcpdump -w MITM.pcap 'host 1.2.3.4'
 
 #### list packets
 ``` sh
-tshark -r MITM.pcap -Tfields -e frame.number -e tcp.time_delta -e ip.src -e ip.id -e ip.ttl -e tcp.window_size -e _ws.col.Info -Y 'ip.addr eq 1.2.3.4'
+tshark -r filename.pcap -Tfields -e frame.number -e tcp.time_delta -e ip.src -e ip.id -e ip.ttl -e tcp.window_size -e _ws.col.Info -Y 'ip.addr eq 1.2.3.4'
 ```
-
+With more details:
+```sh
+tshark -r filename.pcap -T fields -e frame.number -e frame.time_relative -e tcp.time_delta -e tcp.analysis.initial_rtt -e ip.src -e frame.len -e tcp.dstport -e ip.id -e ip.ttl -e tcp.window_size -e tcp.stream -e _ws.col.Info -E header=y -Y 'ip.addr eq 1.2.3.4'
+```
