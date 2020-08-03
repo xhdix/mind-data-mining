@@ -6,13 +6,24 @@ Everything and nothing
 
 ### Censorship
 
-#### check SNI blocking 
+#### check SNI blocking 1
 ``` sh
-curl -v --trace-time -m 31 --connect-to ::www.notblocked.com: https://www.blocked.com/
+curl -4v --trace-time -m 31 --connect-to ::www.notblocked.com: https://www.blocked.com/
+```
+#### check SNI blocking 2
+`4.3.2.1` => notblocked.com 
+``` sh
+curl -v --trace-time -m 31 --resolve 'www.blocked.com:443:4.3.2.1' https://www.blocked.com/
 ```
 #### check IP blocking 1
+`1.2.3.4` => blocked.com 
 ``` sh
-curl -v --trace-time -m 31 --resolve 'www.blocked.com:443:1.2.3.4' --connect-to ::www.blocked.com: https://www.notblocked.com/
+curl -v --trace-time -m 31 --resolve 'www.notblocked.com:80:1.2.3.4' http://www.notblocked.com/
+```
+#### check IP blocking 2
+`1.2.3.4` => blocked.com 
+``` sh
+curl -v --trace-time -m 31 --resolve 'www.notblocked.com:443:1.2.3.4' https://www.notblocked.com/
 ```
 #### DNS over UDP -- system
 ```sh
@@ -30,12 +41,12 @@ dig +tcp blocked.com
 ```sh
 dig +tcp blocked.com @1.0.0.1
 ```
-### DNS over HTTPS
+### DNS over HTTPS 1
 ``` sh
 curl -s  "https://dns.google.com/resolve?name=www.blocked.com&type=ANY&random_padding=cvbnmertyuiaskdkadaas128somerandompaddingminusdomainname128dskvbnmghjkluiobmghjkbnmghjkvbnmcvbnghjklsdfxcvqwertghjydKFs"
 ```
 128 byte <= domain + padding
-
+### DNS over HTTPS 2
 ``` sh
 curl -H 'accept: application/dns-json' 'https://cloudflare-dns.com/dns-query?name=www.blocked.com&type=A'"
 ```
@@ -55,16 +66,6 @@ mtr -n -T 1.2.3.4 -P 1234 --report
 mtr -n 1.2.3.4 --report
 mtr -n -u 1.2.3.4 -P 53 --report
 mtr -n -u 1.2.3.4 -P 22 --report
-```
-
-#### some other test
-``` sh
-curl -sv4 --connect-to ::www.blocked.com https://www.notblocked.com
-curl -sv4 https://www.blocked.com
-curl -sv4 https://www.notblocked.com
-curl -sv4 --connect-to ::www.blocked.com: http://www.notblocked.com
-curl -sv4 http://www.blocked.com
-curl -sv4 http://www.notblocked.com
 ```
 
 #### domain-fronting
