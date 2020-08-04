@@ -9,7 +9,7 @@ function usage_then_die() {
   echo ""
   echo "usage: $0 <test-name> <miniooni-path> <IP> <domain> <URI>" 1>&2
   echo ""
-  echo "e.g.: ./$0 vodafone ../src/probe-engine/miniooni sitename.com 1>&2
+  echo "e.g.: ./$0 vodafone ../src/probe-engine/miniooni sitename.com" 1>&2
   echo ""
   exit 1
 }
@@ -51,7 +51,7 @@ function run() {
 }
 
 function urlgetter() {
-  run $path -v -o $report_file -A step=host_header_blocking -i "$1" urlgetter &
+  run $path -v -o $report_file -A step=host_header_blocking -i http://"$1" urlgetter &
   wait
   log "http test is done."
 }
@@ -68,5 +68,3 @@ while [[ $1 != "" ]]; do
   sleep 1
   shift
 done
-
-
