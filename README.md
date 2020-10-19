@@ -4,7 +4,7 @@ Everything and nothing
 
 ---------------------
 
-### Censorship
+## Censorship
 
 #### check SNI blocking 1
 ``` sh
@@ -86,3 +86,16 @@ With more details:
 ```sh
 tshark -r filename.pcap -T fields -e frame.number -e frame.time_relative -e tcp.time_delta -e tcp.analysis.initial_rtt -e ip.src -e frame.len -e tcp.dstport -e ip.id -e ip.ttl -e tcp.window_size -e tcp.stream -e _ws.col.Info -E header=y -Y 'ip.addr eq 1.2.3.4'
 ```
+
+### OpenSSL
+```sh
+openssl s_client -state -nbio -connect lb-140-82-121-3-fra.github.com:443 2>&1 | grep "^SSL"
+openssl s_client -state -nbio -connect lb-140-82-121-3-fra.github.com:443 | grep "^SSL"
+openssl s_client -state -nbio -connect lb-140-82-121-3-fra.github.com:443
+```
+
+#### check fingerprint
+```sh
+openssl s_client -connect example.com:443 < /dev/null 2>/dev/null | openssl x509 -fingerprint -sha256 -noout -in /dev/stdin
+```
+
