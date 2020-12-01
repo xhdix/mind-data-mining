@@ -50,6 +50,10 @@ curl -s  "https://dns.google.com/resolve?name=www.blocked.com&type=ANY&random_pa
 ``` sh
 curl -H 'accept: application/dns-json' 'https://cloudflare-dns.com/dns-query?name=www.blocked.com&type=A'"
 ```
+Domain-fronting:
+``` sh
+curl -H 'Host: dns.cloudflare.com' -H 'accept: application/dns-json' 'https://cloudflare.com/dns-query?name=www.blocked.com&type=A'"
+```
 Connect with proxy:
 ``` sh
 curl -x socks5://127.0.0.1:9050 -H 'accept: application/dns-json' 'https://cloudflare-dns.com/dns-query?name=www.blocked.com&type=A'"
