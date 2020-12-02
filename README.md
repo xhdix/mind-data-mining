@@ -79,7 +79,7 @@ curl -vH "Host: www.blocked.com" https://www.notblocked.com/
 
 #### capture packets
 ``` sh
-sudo tcpdump -w MITM.pcap 'host 1.2.3.4'
+sudo tcpdump -w filename.pcap 'host 1.2.3.4'
 ```
 
 #### list packets
