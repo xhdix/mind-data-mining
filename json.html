@@ -7,46 +7,51 @@
 
     </style>
     <script>
-        async function addInputsWithIp (url, http3, hostName, json) {
+        time = 1;
+        id= 0;
+        async function addInputsWithIp (textareaId, url, http3, hostName, json) {
+            console.log(textareaId);
             try {
                 answers = json["Answer"];
                 for (let i = 0; i < answers.length; i++) {
                     ip = answers[i]["data"];
-                    inputs.innerHTML += '<textarea rows="3" cols="100" class="input">' 
-                        + '{"name": "dns_check", "input": "'
-                        + url.replace(hostName,ip)
-                        + '", "dns_check":{"domain": "x.org", "http_host": "'
-                        + hostName
-                        + '", "tls_server_name": "'
-                        + hostName
-                        + '"'
-                        + http3
-                        + '}}'
-                        + '</textarea><br><br>';
+                    document.getElementById(textareaId)
+                        .appendChild(document.createTextNode(
+                            '{"name": "dns_check", "input": "'
+                            + url.replace(hostName,ip)
+                            + '", "dns_check":{"domain": "x.org", "http_host": "'
+                            + hostName
+                            + '", "tls_server_name": "'
+                            + hostName
+                            + '"'
+                            + http3
+                            + '}}'
+                            + "\n\n"));
                 }
             }catch(e) {
                 console.log("answer for:" + hostName,  e.message);
             }
         };
 
-        async function resolveIp (url, http3, hostName) {
+        async function resolveIp (textareaId, url, http3, hostName) {
             setTimeout( async function(){
                 var response = await fetch('https://dns.google/resolve?name='
                 + hostName + '&type=A' );
                 var json = await response.json();
                 console.log(json);
-                await addInputsWithIp(url, http3, hostName, json);
+                await addInputsWithIp(textareaId, url, http3, hostName, json);
                 setTimeout( async function(){
                     var response = await fetch('https://dns.google/resolve?name='
                     + hostName + '&type=AAAA' );
                     var json = await response.json();
                     console.log(json);
-                    await addInputsWithIp(url, http3, hostName, json);
-                },3000);
-            },3000);
+                    await addInputsWithIp(textareaId, url, http3, hostName, json);
+                },300);
+            },300);
         };
 
         async function addinputs(url){
+            texts= ""
             matches = url.match(/^(([a-z0-9]+)?\:\/\/)(([^:\/?#]*)(?:\:([0-9]+))?)([\/]{0,1}[^?#]*)(\?([^\?][^#]*)[^#]*|)(#.*|)$/);
             console.log(matches);
             protoFull = matches && matches[1];
@@ -61,71 +66,83 @@
             console.log(path);
             querys = matches && matches[8];
             console.log(querys);
+            textareaAts= 'rows="15" cols="150" class="input"'
             if ( proto == 'https' || proto == 'http3' || proto == 'dot' ) {
-                inputs.innerHTML += '<textarea rows="3" cols="100" class="input">' 
-                    + '{"name": "dns_check", "input": "udp://8.8.8.8"'
+                textareaId= "txt" + id++;
+                console.log(textareaId);
+                texts += '{"name": "dns_check", "input": "udp://8.8.8.8"'
                     + ', "dns_check":{"domain": "'
                     + hostName
                     + '"}}'
-                    + '</textarea><br><br>'; 
-                inputs.innerHTML += '<textarea rows="3" cols="100" class="input">' 
-                    + '{"name": "dns_check", "input": "udp://9.9.9.9"'
+                    + "\n\n";
+                texts += '{"name": "dns_check", "input": "udp://9.9.9.9"'
                     + ', "dns_check":{"domain": "'
                     + hostName
                     + '"}}'
-                    + '</textarea><br><br>'; 
-                
+                    + "\n\n";
+
                 http3 = "";
                 if (proto == 'http3') {
                     http3 = ',"http3_enabled":true'
                     url.replace("http3://", "https://")
                 }
                 if (RegExp("^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$").test(hostName)) {
-                    inputs.innerHTML += '<textarea rows="3" cols="100" class="input">' 
-                        + '{"name": "dns_check", "input": "'
+                    texts +='{"name": "dns_check", "input": "'
                         + url 
                         + '", "dns_check":{"domain": "x.org"'
                         + http3
                         + '}}'
+                        + "\n\n";
+                    inputs.innerHTML += '<textarea id="'
+                        + textareaId 
+                        + '"' + textareaAts + '>' 
+                        + texts
                         + '</textarea><br><br>'; 
                 }else {
-                    inputs.innerHTML += '<textarea rows="3" cols="100" class="input">' 
-                        + '{"name": "dns_check", "input": "'
+                    texts += '{"name": "dns_check", "input": "'
                         + url 
                         + '", "dns_check":{"domain": "x.org", "http_host": "'
                         +  hostName
                         + '"'
                         + http3
                         + '}}'
-                        + '</textarea><br><br>';
-                    
-                    await resolveIp(url, http3, hostName);
+                        + "\n\n";
+                    inputs.innerHTML += '<textarea id="'
+                        + textareaId 
+                        + '"' + textareaAts + '>' 
+                        + texts
+                        + '</textarea><br><br>'; 
+                    setTimeout( async function(){
+                        await resolveIp(textareaId, url, http3, hostName);
+                    },300);
                 }
-                
             }else if ( proto == 'udp' || proto == 'tcp' ){
                 if (querys != null) {
-                    inputs.innerHTML += '<textarea rows="3" cols="100" class="input">' 
-                        + '{"name": "dns_check", "input": "'
+                    texts += '{"name": "dns_check", "input": "'
                         + protoFull + hostNamePort 
                         + '", "dns_check":{"domain": "x.org"}}'
-                        + '</textarea><br><br>'; 
+                        + "\n\n"; 
 
                     querysArray = querys.split(/&/g);
                     querysArray.forEach( query => {
                         domains = query.match(/([^=]+)=([^=]+)/);
                         if (domains[1] == "domain") {
-                            inputs.innerHTML += '<textarea rows="3" cols="100" class="input">' 
-                                + '{"name": "dns_check", "input": "'
+                            texts += '{"name": "dns_check", "input": "'
                                 + protoFull + hostNamePort  
                                 + '", "dns_check":{"domain": "'
                                 + domains[2]
                                 + '"}}'
-                                + '</textarea><br><br>'; 
+                                + "\n\n"; 
                         }
                     
                     });
+                    inputs.innerHTML += '<textarea '
+                        + textareaAts + '">' 
+                        + texts
+                        + '</textarea><br><br>'; 
                 }else {
-                    inputs.innerHTML += '<textarea rows="3" cols="100" class="input">' 
+                    inputs.innerHTML += '<textarea '
+                        + textareaAts + '">'  
                         + '{"name": "dns_check", "input": "'
                         + url 
                         + '", "dns_check":{"domain": "x.org"}}'
@@ -134,23 +151,24 @@
             }
         };
 
-        function parseurls (urlslist) {
-            urlslist.forEach( async (url) => {
+        async function parseurls (urlslist) {
+            await urlslist.forEach( async (url) => {
                 if (url != "" ){
-                    await addinputs(url);
+                    time += 3000
+                    setTimeout( async function(){await addinputs(url);},time);
                 }
             });
         }
 
-        function pasteurl(t,e) {
+        async function pasteurl(t,e) {
             urlslist = (e.clipboardData || window.clipboardData)
                 .getData('text')
                 .replace(/^(?=\n)$|^\s*|\s*$|\n\n+/gm,"")
                 .split(/\r\n|\r|\n/g);
             console.log(urlslist);
-            parseurls(urlslist);
+            setTimeout( async function(){await parseurls(urlslist);},time);
             e.preventDefault();
-            t.innerText = "well done :D"
+            t.innerText = "well done :D";
         };
     </script>
 </head>
@@ -159,6 +177,7 @@
 <div>
     <div id="inputs">
         <p contenteditable="true" onPaste="pasteurl(this,event)" > \o/ paste here...</p>
+        <p id="pastebox" contenteditable="true" > o/ paste here...</p>
         <br><br>
         <!-- <input class="input" vol=3 value=""/> -->
         <!-- <textarea rows="3" cols="100" class="input"></textarea> -->
@@ -178,10 +197,11 @@
         for (let textarea of textareas) {
             outputText += textarea.value;
             outputText +=  "\n";
+            outputText.replace(/^(?=\n)$|^\s*|\s*$|\n\n+/gm,"");
             output.innerText = outputText;
         }
 
-    }
+    };
 
 </script>
 
