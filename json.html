@@ -31,9 +31,9 @@
                     ip = answers[i]["data"];
                     document.getElementById(textareaId)
                         .appendChild(document.createTextNode(
-                            '{"name": "dns_check", "input": "'
+                            '{"name": "dnscheck", "input": "'
                             + url.replace(hostName,ip)
-                            + '", "dns_check":{"domain": "x.org", "http_host": "'
+                            + '", "dnscheck":{"domain": "x.org", "http_host": "'
                             + hostName
                             + '", "tls_server_name": "'
                             + hostName
@@ -104,9 +104,9 @@
                     url = url.replace("http3://", "https://");
                 }
                 if (RegExp("^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$").test(hostName)) {
-                    texts +='{"name": "dns_check", "input": "'
+                    texts +='{"name": "dnscheck", "input": "'
                         + url 
-                        + '", "dns_check":{"domain": "x.org"'
+                        + '", "dnscheck":{"domain": "x.org"'
                         + http3
                         + '}}'
                         + "\n\n";
@@ -120,20 +120,20 @@
                     thisTextarea.style.height = thisTextarea.scrollHeight + 'px';
                     
                 }else {
-                    texts += '{"name": "dns_check", "input": "udp://8.8.8.8"'
-                        + ', "dns_check":{"domain": "'
+                    texts += '{"name": "dnscheck", "input": "udp://8.8.8.8"'
+                        + ', "dnscheck":{"domain": "'
                         + hostName
                         + '"}}'
                         + "\n\n";
-                    texts += '{"name": "dns_check", "input": "udp://9.9.9.9"'
-                        + ', "dns_check":{"domain": "'
+                    texts += '{"name": "dnscheck", "input": "udp://9.9.9.9"'
+                        + ', "dnscheck":{"domain": "'
                         + hostName
                         + '"}}'
                         + "\n\n";
 
-                    texts += '{"name": "dns_check", "input": "'
+                    texts += '{"name": "dnscheck", "input": "'
                         + url 
-                        + '", "dns_check":{"domain": "x.org", "http_host": "'
+                        + '", "dnscheck":{"domain": "x.org", "http_host": "'
                         +  hostName
                         + '"'
                         + http3
@@ -154,18 +154,18 @@
                 }
             }else if ( proto == 'udp' || proto == 'tcp' ){
                 if (querys != null) {
-                    texts += '{"name": "dns_check", "input": "'
+                    texts += '{"name": "dnscheck", "input": "'
                         + protoFull + hostNamePort 
-                        + '", "dns_check":{"domain": "x.org"}}'
+                        + '", "dnscheck":{"domain": "x.org"}}'
                         + "\n\n"; 
 
                     querysArray = querys.split(/&/g);
                     querysArray.forEach( query => {
                         domains = query.match(/([^=]+)=([^=]+)/);
                         if (domains[1] == "domain") {
-                            texts += '{"name": "dns_check", "input": "'
+                            texts += '{"name": "dnscheck", "input": "'
                                 + protoFull + hostNamePort  
-                                + '", "dns_check":{"domain": "'
+                                + '", "dnscheck":{"domain": "'
                                 + domains[2]
                                 + '"}}'
                                 + "\n\n"; 
@@ -184,9 +184,9 @@
                     inputs.innerHTML += '<textarea id="'
                         + textareaId + '" '
                         + textareaAts + '">'  
-                        + '{"name": "dns_check", "input": "'
+                        + '{"name": "dnscheck", "input": "'
                         + url 
-                        + '", "dns_check":{"domain": "x.org"}}'
+                        + '", "dnscheck":{"domain": "x.org"}}'
                         + "\n\n"
                         + '</textarea><br><br>'; 
                     
