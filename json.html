@@ -115,6 +115,10 @@
                         + '"' + textareaAts + '>' 
                         + texts
                         + '</textarea><br><br>'; 
+
+                    thisTextarea = document.getElementById(textareaId);
+                    thisTextarea.style.height = thisTextarea.scrollHeight + 'px';
+                    
                 }else {
                     texts += '{"name": "dns_check", "input": "udp://8.8.8.8"'
                         + ', "dns_check":{"domain": "'
@@ -183,6 +187,7 @@
                         + '{"name": "dns_check", "input": "'
                         + url 
                         + '", "dns_check":{"domain": "x.org"}}'
+                        + "\n\n"
                         + '</textarea><br><br>'; 
                     
                     thisTextarea = document.getElementById(textareaId);
