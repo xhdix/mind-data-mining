@@ -25,6 +25,7 @@
             console.log(textareaId);
             queueleft--;
             queue.innerText = "Remaining in the queue:  " + queueleft;
+            texts="";
             try {
                 answers = json["Answer"];
                 for (let i = 0; i < answers.length; i++) {
@@ -32,22 +33,30 @@
                     if (RegExp(/[\w:]+:+[\w:]+/).test(ip)) {
                         ip = '[' + ip + ']';
                     }
-                    document.getElementById(textareaId)
-                        .appendChild(document.createTextNode(
-                            '{"name": "dnscheck", "input": "'
-                            + url.replace(hostName,ip)
-                            + '", "dnscheck":{"domain": "x.org", "http_host": "'
-                            + hostName
-                            + '", "tls_server_name": "'
-                            + hostName
-                            + '"'
-                            + http3
-                            + '}}'
-                            + "\n\n"));
+                    texts += '{"name": "dnscheck", "input": "'
+                        + url.replace(hostName,ip)
+                        + '", "dnscheck":{"domain": "x.org", "http_host": "'
+                        + hostName
+                        + '", "tls_server_name": "'
+                        + hostName
+                        + '"'
+                        + http3
+                        + '}}'
+                        + "\n\n";
+                    // TLS blocking test
+                    texts += '{"name": "dnscheck", "input": "'
+                        + url.replace(hostName,ip)
+                        + '", "dnscheck":{"domain": "x.org", "http_host": "'
+                        + 'www.x.org", "tls_server_name": "www.x.org"'
+                        + http3
+                        + '}}'
+                        + "\n\n";
                 }
             }catch(e) {
                 console.log("answer for:" + hostName,  e.message);
             }
+            document.getElementById(textareaId)
+                .appendChild(document.createTextNode( texts ));
 
             thisTextarea = document.getElementById(textareaId);
             thisTextarea.style.height = thisTextarea.scrollHeight + 'px';
@@ -93,6 +102,8 @@
             console.log(hostNamePort);
             hostName = matches && matches[4];
             console.log(hostName);
+            port = matches && matches[5];
+            console.log(port);
             path = matches && matches[6];
             console.log(path);
             querys = matches && matches[8];
@@ -138,6 +149,16 @@
                         + url 
                         + '", "dnscheck":{"domain": "x.org", "http_host": "'
                         +  hostName
+                        + '"'
+                        + http3
+                        + '}}'
+                        + "\n\n";
+                    // SNI blocking test
+                    texts += '{"name": "dnscheck", "input": "'
+                        + url.replace(hostName,"www.x.org")
+                        + '", "dnscheck":{"domain": "x.org", "http_host": "'
+                        +  'www.x.org", "tls_server_name": "'
+                        + hostName
                         + '"'
                         + http3
                         + '}}'
@@ -222,7 +243,7 @@
                 .trim()
                 .split(/\r\n|\r|\n/g)
             console.log(urlslist);
-            setTimeout( async function(){await parseurls(urlslist);},time);
+            setTimeout( async function(){await parseurls(urlslist);},30);
             e.preventDefault();
             t.innerText = "well done :D";
         };
