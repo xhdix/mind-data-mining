@@ -93,9 +93,10 @@ tshark -r filename.pcap -T fields -e frame.number -e frame.time_relative -e tcp.
 
 ### OpenSSL
 ```sh
-openssl s_client -state -nbio -connect lb-140-82-121-3-fra.github.com:443 2>&1 | grep "^SSL"
-openssl s_client -state -nbio -connect lb-140-82-121-3-fra.github.com:443 | grep "^SSL"
-openssl s_client -state -nbio -connect lb-140-82-121-3-fra.github.com:443
+openssl s_client -state -nbio -connect www.blocked.com:443 2>&1 | grep "^SSL"
+openssl s_client -state -nbio -connect www.blocked.com:443 | grep "^SSL"
+openssl s_client -state -nbio -connect www.blocked.com:443
+openssl s_client -state -nbio -tlsextdebug -servername www.blocked.com -connect 1.2.3.4:443
 ```
 
 #### check fingerprint
