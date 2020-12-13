@@ -29,6 +29,9 @@
                 answers = json["Answer"];
                 for (let i = 0; i < answers.length; i++) {
                     ip = answers[i]["data"];
+                    if (RegExp(/[\w:]+:+[\w:]+/).test(ip)) {
+                        ip = '[' + ip + ']';
+                    }
                     document.getElementById(textareaId)
                         .appendChild(document.createTextNode(
                             '{"name": "dnscheck", "input": "'
