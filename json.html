@@ -21,40 +21,56 @@
         id= 0;
         queueleft=0;
         urlsLen=0;
-        async function addInputsWithIp (textareaId, url, http3, hostName, json) {
+        async function addInputsWithIp (textareaId, url, http3, proto, hostName, port, ips) {
             console.log(textareaId);
             queueleft--;
             queue.innerText = "Remaining in the queue:  " + queueleft;
             texts="";
-            try {
-                answers = json["Answer"];
-                for (let i = 0; i < answers.length; i++) {
-                    ip = answers[i]["data"];
-                    if (RegExp(/[\w:]+:+[\w:]+/).test(ip)) {
-                        ip = '[' + ip + ']';
-                    }
-                    texts += '{"name": "dnscheck", "input": "'
-                        + url.replace(hostName,ip)
-                        + '", "dnscheck":{"domain": "example.org", "http_host": "'
-                        + hostName
-                        + '", "tls_server_name": "'
-                        + hostName
-                        + '"'
-                        + http3
-                        + '}}'
-                        + "\n\n";
-                    // TLS blocking test
-                    texts += '{"name": "dnscheck", "input": "'
-                        + url.replace(hostName,ip)
-                        + '", "dnscheck":{"domain": "example.org", "http_host": "'
-                        + 'www.example.org", "tls_server_name": "www.example.org"'
-                        + http3
-                        + '}}'
-                        + "\n\n";
+            ipsString = '"default_addrs": ['
+            ipsLen = ips.length;
+            j = 0;
+            ips.forEach(ip => {
+                j++;
+                if (RegExp(/[\w:]+:+[\w:]+/).test(ip)) {
+                    ip = '[' + ip + ']';
                 }
-            }catch(e) {
-                console.log("answer for:" + hostName,  e.message);
+                ipsString += '"' + ip ;
+                if (j == ipsLen) {
+                    ipsString += '"';
+                } else {
+                    ipsString += '", ';
+                }
+            });
+            if (proto == "https" && (port == 443 || port == null)) {
+                ipsString += ', "93.184.216.34"],'; // SNI Blocking test (example.org)
+            }else {
+                ipsString += '],';
             }
+            texts += '{"name": "dnscheck", "input": "'
+                + url
+                + '", "dnscheck":{'
+                + ipsString
+                + ' "domain": "example.org", "http_host": "'
+                + hostName
+                + '", "tls_server_name": "'
+                + hostName
+                + '"'
+                + http3
+                + '}}'
+                + "\n\n";
+            // TLS blocking test
+            ips.forEach(ip => {
+                if (RegExp(/[\w:]+:+[\w:]+/).test(ip)) {
+                    ip = '[' + ip + ']';
+                }
+                texts += '{"name": "dnscheck", "input": "'
+                    + url.replace(hostName,ip)
+                    + '", "dnscheck":{"domain": "example.org", "http_host": "'
+                    + 'www.example.org", "tls_server_name": "www.example.org"'
+                    + http3
+                    + '}}'
+                    + "\n\n";
+            });
             document.getElementById(textareaId)
                 .appendChild(document.createTextNode( texts ));
 
@@ -67,7 +83,7 @@
             }
         };
 
-        async function resolveIp (textareaId, url, http3, hostName) {
+        async function resolveIp (textareaId, url, http3, proto, hostName) {
             queueleft+= 2;
             queue.innerText = "Remaining in the queue:  " + queueleft;
             time += 500;
@@ -77,15 +93,31 @@
                 var json = await response.json();
                 console.log(json);
                 queue.innerText = "Remaining in the queue:  " + queueleft;
-                await addInputsWithIp(textareaId, url, http3, hostName, json);
                 time += 500;
+                ips = [];
+                try {
+                    answers = json["Answer"];
+                    for (let i = 0; i < answers.length; i++) {
+                        ips.push(answers[i]["data"]);
+                    }
+                }catch(e) {
+                    console.log("answer for:" + hostName,  e.message);
+                }
                 await setTimeout( async function(){
-                    var response = await fetch('https://dns.google/resolve?name='
+                    var response6 = await fetch('https://dns.google/resolve?name='
                     + hostName + '&type=AAAA' );
-                    var json = await response.json();
-                    console.log(json);
+                    var json6 = await response6.json();
+                    console.log(json6);
                     queue.innerText = "Remaining in the queue:  " + queueleft;
-                    await addInputsWithIp(textareaId, url, http3, hostName, json);
+                    try {
+                        answers6 = json6["Answer"];
+                        for (let i = 0; i < answers6.length; i++) {
+                            ips.push(answers6[i]["data"]);
+                        }
+                    }catch(e) {
+                        console.log("answer for:" + hostName,  e.message);
+                    }
+                    await addInputsWithIp(textareaId, url, http3, proto, hostName, port, ips);
                 },time);
             },time);
         };
@@ -145,26 +177,6 @@
                         + '"}}'
                         + "\n\n";
 
-                    texts += '{"name": "dnscheck", "input": "'
-                        + url 
-                        + '", "dnscheck":{"domain": "example.org", "http_host": "'
-                        +  hostName
-                        + '"'
-                        + http3
-                        + '}}'
-                        + "\n\n";
-                    // SNI blocking test
-                    if (proto == "https" && (port == 443 || port == null)) {
-                        texts += '{"name": "dnscheck", "input": "'
-                            + url.replace(hostName,"www.example.org")
-                            + '", "dnscheck":{"domain": "example.org", "http_host": "'
-                            +  'www.example.org", "tls_server_name": "'
-                            + hostName
-                            + '"'
-                            + http3
-                            + '}}'
-                            + "\n\n";
-                    }
                     inputs.innerHTML += '<textarea id="'
                         + textareaId 
                         + '"' + textareaAts + '>' 
@@ -175,7 +187,7 @@
                     thisTextarea = document.getElementById(textareaId);
                     thisTextarea.style.height = thisTextarea.scrollHeight + 'px';
                     
-                    await resolveIp(textareaId, url, http3, hostName);
+                    await resolveIp(textareaId, url, http3, proto, hostName, port);
                     
                 }
             }else if ( proto == 'udp' || proto == 'tcp' ){
