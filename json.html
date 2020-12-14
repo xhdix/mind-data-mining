@@ -78,7 +78,7 @@
             thisTextarea.style.height = thisTextarea.scrollHeight + 'px';
             
             if (urlsLen == 0 && queueleft == 0) {
-                gotoBottom.style.visibility = "visible";
+                finished.style.visibility = "visible";
                 generate.style.visibility = "visible";
             }
         };
@@ -92,8 +92,6 @@
                 + hostName + '&type=A' );
                 var json = await response.json();
                 console.log(json);
-                queue.innerText = "Remaining in the queue:  " + queueleft;
-                time += 500;
                 ips = [];
                 try {
                     answers = json["Answer"];
@@ -104,6 +102,8 @@
                     console.log("answer for:" + hostName,  e.message);
                 }
                 queueleft--;
+                queue.innerText = "Remaining in the queue:  " + queueleft;
+                time += 500;
                 await setTimeout( async function(){
                     var response6 = await fetch('https://dns.google/resolve?name='
                     + hostName + '&type=AAAA' );
@@ -276,7 +276,7 @@
     <br><br>
     <div id="queue" ></div>
     <br><br>
-    <button id="gotoBottom" onclick="gotoBottom()" >
+    <button id="finished" onclick="gotoBottom()" >
          finished! ;)
     </button>
     <br><br>
