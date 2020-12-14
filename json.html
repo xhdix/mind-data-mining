@@ -154,7 +154,7 @@
                         + '}}'
                         + "\n\n";
                     // SNI blocking test
-                    if (proto != "dot" && (port == 443 || port == null)) {
+                    if (proto == "https" && (port == 443 || port == null)) {
                         texts += '{"name": "dnscheck", "input": "'
                             + url.replace(hostName,"www.example.org")
                             + '", "dnscheck":{"domain": "example.org", "http_host": "'
@@ -263,7 +263,7 @@
     <br><br>
     <div id="queue" ></div>
     <br><br>
-    <button id="godown" onclick="godBottom()" >
+    <button id="gotoBottom" onclick="gotoBottom()" >
          finished! ;)
     </button>
     <br><br>
@@ -276,7 +276,7 @@
     <br><br>
 </div>
 <script>
-    function godBottom(){
+    function gotoBottom(){
         window.scrollTo(0,document.body.scrollHeight);
     }
 
