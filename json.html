@@ -103,6 +103,7 @@
                 }catch(e) {
                     console.log("answer for:" + hostName,  e.message);
                 }
+                queueleft--;
                 await setTimeout( async function(){
                     var response6 = await fetch('https://dns.google/resolve?name='
                     + hostName + '&type=AAAA' );
