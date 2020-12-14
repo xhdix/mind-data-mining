@@ -228,7 +228,8 @@
             await urlslist.forEach( async (url) => {
                 url.trim();
                 if (url != "" ){
-                    await addinputs(url);
+                    time += 50
+                    setTimeout( async function(){await addinputs(url);},time);
                 }else {
                     urlsLen--;
                     urlsleft.innerText = "Remaining URLs:  " + urlsLen;
@@ -243,7 +244,7 @@
                 .trim()
                 .split(/\r\n|\r|\n/g)
             console.log(urlslist);
-            setTimeout( async function(){await parseurls(urlslist);},30);
+            setTimeout( async function(){await parseurls(urlslist);},time);
             e.preventDefault();
             t.innerText = "well done :D";
         };
