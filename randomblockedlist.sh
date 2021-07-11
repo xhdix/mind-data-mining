@@ -20,7 +20,7 @@ declare -A ips
 echo "finding injections..."
 set -f        # disable globbing
 IFS=$'\n'     # set field separator to NL (only)
-streams=( $(tshark -nr $filename -Tfields -e tcp.stream -Y "ip.ttl > $min && ip.ttl < $max && tcp && !icmp") )
+streams=( $(tshark -nr $filename -Tfields -e tcp.stream -2R "ip.ttl > $min && ip.ttl < $max" -Y "!icmp && tcp.port eq 443") )
 
 tsharkstreams=""
 i=0
@@ -49,7 +49,7 @@ echo "total injected in streams: $i"
 
 echo "finding server names..."
 
-servernames=( $(tshark -nr $filename -Tfields -e tls.handshake.extensions_server_name -Y "$tsharkstreams && tls.handshake.extension.type eq 0") )
+servernames=( $(tshark -nr $filename -Tfields -e tls.handshake.extensions_server_name -2R "$tsharkstreams && tls.handshake.extension.type eq 0") )
 
 for servername in "${servernames[@]}"; do
     if [[ -v "domains[$servername]" ]] ; then
@@ -78,7 +78,7 @@ echo ""
 
 echo "finding IPs..."
 
-serverips=( $(tshark -nr $filename -Tfields -e ip.dst -Y "$tsharkstreams && tcp.flags eq 0x002") )
+serverips=( $(tshark -nr $filename -Tfields -e ip.dst -2R "$tsharkstreams && tcp.flags eq 0x002") )
 
 for serverip in "${serverips[@]}"; do
     if [[ -v "ips[$serverip]" ]] ; then
