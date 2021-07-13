@@ -77,6 +77,10 @@ curl -vH "Host: www.blocked.com" https://www.notblocked.com/
 ``` sh
 sudo tcpdump -w filename.pcap 'host 1.2.3.4'
 ```
+Capture all packets related to requests from a VPS (e.g. ooni-probe requests):
+```sh
+sudo tcpdump -s0 -B4096 -w filename.pcap '(icmp and dst net 1.2.3.4 and (tcp port 80 or tcp port 443 or udp port 53)) or ((net 8.8.8.8 or net 8.8.4.4) and dst net 1.2.3.4) or (tcp and net 1.2.3.4 and (tcp port 80 or tcp port 443)) and not net 4.3.2.1 and not (dst net 1.2.3.4 and tcp[tcpflags] == tcp-syn)'
+```
 
 #### list packets
 ``` sh
