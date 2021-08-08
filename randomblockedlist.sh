@@ -20,7 +20,7 @@ declare -A ips
 echo "finding injections..."
 set -f        # disable globbing
 IFS=$'\n'     # set field separator to NL (only)
-streams=( $(tshark -nr $filename -Tfields -e tcp.stream -2R "ip.ttl > $min && ip.ttl < $max" -Y "!icmp && tcp.port eq 443") )
+streams=( $(tshark -nr $filename -Tfields -e tcp.stream -2R "ip.ttl > $min && ip.ttl < $max" -Y "!icmp && tcp.port eq 443 && tcp.flags ne 0x014") )
 
 tsharkstreams=""
 i=0
