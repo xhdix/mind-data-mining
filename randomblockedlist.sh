@@ -1,11 +1,14 @@
 #!/bin/bash
 
 #bash ./domainlist filename.pcap minTTL maxTTL
+# or:
+#for i in $(find ./ -type f -name '*.pcap'); do ./randomblockedlist.sh $i minTTL maxTTL; done
 
 filename=$1
 min=$2
 max=$3
 
+echo $filename
 
 if [[ $filename == "" ]] || [[ $min == "" ]] || [[ $max == "" ]] ; then
     echo "usage:"
@@ -21,6 +24,12 @@ echo "finding injections..."
 set -f        # disable globbing
 IFS=$'\n'     # set field separator to NL (only)
 streams=( $(tshark -nr $filename -Tfields -e tcp.stream -2R "ip.ttl > $min && ip.ttl < $max" -Y "!icmp && tcp.port eq 443 && tcp.flags ne 0x014") )
+
+if [ ${#streams[@]} -eq 0 ]; then
+    echo "there is no injected stream."
+    echo ""
+    exit
+fi
 
 tsharkstreams=""
 i=0
