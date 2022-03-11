@@ -39,3 +39,8 @@ for testip in $(cat $inputfile); do
     wait
 done
 
+
+
+# download measurements:
+#
+# for measurement in $(cat ./measurement_name.txt); do measurementgid=$(echo ${measurement:0:(-1)} | jq .measurements[0]); for result in $(curl -sS https://atlas.ripe.net/api/v2/measurements/$measurementgid/results/?format=json|jq -c '.[]'); do echo "$result," >> ./measurement_name_results.txt ;done; sleep 3; done
