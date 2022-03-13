@@ -14,9 +14,9 @@ function runcurl() {
     if [[ "${output:0:15}" == '{"measurements"' ]]; then
         echo "$output," >> $outputfile &
         wait
-        return 1
-    else
         return 0
+    else
+        return 1
     fi
 }
 
@@ -25,9 +25,7 @@ for testip in $(cat $inputfile); do
     wait
     echo "$testip"
     while $shouldwait; do
-        output= runcurl "$testip" &
-        wait
-        if $output; then
+        if runcurl "$testip" ; then
             shouldwait=false
         else
             sleep 10 &
