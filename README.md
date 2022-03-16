@@ -108,3 +108,7 @@ openssl s_client -state -nbio -tlsextdebug -servername www.blocked.com -connect 
 openssl s_client -connect example.com:443 < /dev/null 2>/dev/null | openssl x509 -fingerprint -sha256 -noout -in /dev/stdin
 ```
 
+#### decode OONI probe result certificate data
+```
+echo $cert | base64 -d | openssl x509 -inform der -noout -text
+```
