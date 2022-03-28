@@ -7,8 +7,10 @@ outputfile="measurement-name.txt"
 emailaddr="name@email.com"
 tags='"tag1","tag2"'
 
+probecount=$(echo $probelist| tr ',' ' ' | wc -w)
+
 function runcurl() {
-    poststring='{"definitions":[{"target":"'$1'","af":4,"timeout":4000,"description":"Traceroute measurement to '$1'","protocol":"TCP","tags":['$tags'],"resolve_on_probe":false,"packets":3,"size":48,"first_hop":1,"max_hops":50,"port":443,"paris":0,"destination_option_size":0,"hop_by_hop_option_size":0,"dont_fragment":true,"skip_dns_check":true,"type":"traceroute"}],"probes":[{"value":"'$probelist'","type":"probes","requested":5}],"is_oneoff":true,"bill_to":"'$emailaddr'"}'
+    poststring='{"definitions":[{"target":"'$1'","af":4,"timeout":4000,"description":"Traceroute measurement to '$1'","protocol":"TCP","tags":['$tags'],"resolve_on_probe":false,"packets":3,"size":48,"first_hop":1,"max_hops":50,"port":443,"paris":0,"destination_option_size":0,"hop_by_hop_option_size":0,"dont_fragment":true,"skip_dns_check":true,"type":"traceroute"}],"probes":[{"value":"'$probelist'","type":"probes","requested":'$probecount'}],"is_oneoff":true,"bill_to":"'$emailaddr'"}'
     output=$(curl -sS -H 'Content-Type: application/json' -H 'Accept: application/json' -X POST -d "$poststring" https://atlas.ripe.net/api/v2/measurements//?key=$ripekey)
     echo $output
     if [[ "${output:0:15}" == '{"measurements"' ]]; then
