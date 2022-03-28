@@ -7,8 +7,10 @@ outputfile="measurement-name.txt"
 emailaddr="name@email.com"
 tags='"tag1","tag2"'
 
+probecount=$(echo $probelist| tr ',' ' ' | wc -w)
+
 function runcurl() {
-    poststring='{"definitions":[{"target":"'$1'","af":4,"packets":10,"size":48,"description":"Ping measurement to '$1'","tags":['$tags'],"resolve_on_probe":false,"packet_interval":500,"skip_dns_check":true,"include_probe_id":false,"type":"ping"}],"probes":[{"value":"'$probelist'","type":"probes","requested":1}],"is_oneoff":true,"bill_to":"'$emailaddr'"}'
+    poststring='{"definitions":[{"target":"'$1'","af":4,"packets":10,"size":48,"description":"Ping measurement to '$1'","tags":['$tags'],"resolve_on_probe":false,"packet_interval":500,"skip_dns_check":true,"include_probe_id":false,"type":"ping"}],"probes":[{"value":"'$probelist'","type":"probes","requested":'$probecount'}],"is_oneoff":true,"bill_to":"'$emailaddr'"}'
     output=$(curl -sS -H 'Content-Type: application/json' -H 'Accept: application/json' -X POST -d "$poststring" https://atlas.ripe.net/api/v2/measurements//?key=$ripekey)
     echo $output
     if [[ "${output:0:15}" == '{"measurements"' ]]; then
